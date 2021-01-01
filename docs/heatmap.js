@@ -36,7 +36,7 @@ function getDataFile() {
 
 function setup() {
     colorMode(HSB, 360, 100, 100, 100);
-    $.getJSON(getDataFile(), (data) => {
+    $.getJSON(getDataFile(), function(data) {
         d = data;
         X = data["dates"].length;
         Y = data["years"].length;
