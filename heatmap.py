@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import codecs
 from datetime import datetime, timedelta
 import json
@@ -9,9 +10,9 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 
 def load_csv_jma():
-    df_orig = pd.read_csv("data/1900-2020_daily_high.csv", skiprows=[0,1,2,4], encoding="shift_jis")
+    #df_orig = pd.read_csv("data/1900-2020_daily_high.csv", skiprows=[0,1,2,4], encoding="shift_jis")
     #df_orig = pd.read_csv("data/1900-2020_daily_low.csv", skiprows=[0,1,2,4,5], encoding="shift_jis")
-    #df_orig = pd.read_csv("data/1900-2020_daily_mean.csv", skiprows=[0,1,2,4], encoding="shift_jis")
+    df_orig = pd.read_csv("data/1900-2020_daily_mean.csv", skiprows=[0,1,2,4], encoding="shift_jis")
     # create data
     df = pd.DataFrame()
     for index, row in df_orig.iterrows():
@@ -75,16 +76,21 @@ if __name__ == "__main__":
     print("mean:", t_mean, " min:", t_min, " max:", t_max)
     
     # visualize
+    sns.set_context('notebook') # 'paper', 'notebook', 'talk', 'poster'
+    #sns.set(font_scale=1.2)
     plt.figure(figsize=(20, 16))
-
+ 
     #sns.heatmap(df, cmap="bwr", vmax=t_max, vmin=t_min, center=t_mean, linewidth=0)
     #sns.heatmap(df, cmap="RdBu_r", vmax=t_max, vmin=t_min, center=t_mean, linewidth=0)
     #sns.heatmap(df, cmap="nipy_spectral", vmax=t_max, vmin=t_min, center=t_mean, linewidth=0)
-    sns.heatmap(df, cmap="jet", vmax=t_max, vmin=t_min, center=t_mean, linewidth=0)
+    ax = sns.heatmap(df, cmap="jet", vmax=t_max, vmin=t_min, center=t_mean, linewidth=0, cbar_kws= {'label': u'(°C)'})
+    #ax.set(xlabel ='x-axis', ylabel='y-axis', xlim=(0,50), ylim=(0,5000))
+    ax.set(xlabel =u'月/日', ylabel=u'年')
+    #ax.figure.axes[-1].yaxis.label.set_size(50)
 
     #cmap = sns.diverging_palette(250, 10, n=20)
-    #cmap = sns.hls_palette(20, h=.66, l=0.5, s=1)
-    #sns.heatmap(df, cmap=cmap, vmax=t_max, vmin=t_min, center=t_mean, linewidth=0)
+    #cmap = sns.hls_palette(10, h=.66, l=.3, s=1)
+    #sns.heatmap(df, cmap=cmap.reversed(), vmax=t_max, vmin=t_min, center=t_mean, linewidth=0)
 
     myColors = ((0.0, 0.0, 1.0, 1.0),
                 (0.1, 0.1, 0.9, 1.0),
@@ -101,4 +107,7 @@ if __name__ == "__main__":
     #sns.heatmap(df, cmap=cmap, vmax=t_max, vmin=t_min, center=t_mean, linewidth=0)
     #sns.heatmap(df, cmap=cmap, linewidth=0)
 
-    plt.savefig('img/heatmap.png')
+    #plt.setp(sb.get_legend().get_texts(), fontsize='22')
+    
+    plt.savefig('img/heatmap.png', bbox_inches='tight')
+    #plt.savefig('img/heatmap.eps', bbox_inches='tight')
