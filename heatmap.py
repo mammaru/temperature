@@ -9,28 +9,33 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 
-def load_csv_jma():
+def load_csv_jma(months):
     #df_orig = pd.read_csv("data/1900-2020_daily_high.csv", skiprows=[0,1,2,4], encoding="shift_jis")
     #df_orig = pd.read_csv("data/1900-2020_daily_low.csv", skiprows=[0,1,2,4,5], encoding="shift_jis")
-    df_orig = pd.read_csv("data/1900-2020_daily_mean.csv", skiprows=[0,1,2,4], encoding="shift_jis")
+    #df_orig = pd.read_csv("data/1900-2020_daily_mean.csv", skiprows=[0,1,2,4], encoding="shift_jis")
+    df_orig = pd.read_csv("data/1900-2020.csv", skiprows=[0,1,2,4], encoding="shift_jis")
     # create data
     df = pd.DataFrame()
     for index, row in df_orig.iterrows():
         try:
-            r = str(int(row[0]))
-            c = str(int(row[1])) + "/" + str(int(row[2]))
-            t = row[3]
-            if not (c in df.columns):
-                df[c] = np.nan
-            if not (r in df.index):
-                df.loc[r] = np.nan
-            df.at[r, c] = t
+            if int(row[1]) in months:
+                r = str(int(row[0]))
+                c = str(int(row[1])) + "/" + str(int(row[2]))
+                t = row[3]
+                if not (c in df.columns):
+                    df[c] = np.nan
+                if not (r in df.index):
+                    df.loc[r] = np.nan
+                df.at[r, c] = t
         except:
+            print("passed: row " + str(index) + " : " + row.join(",") )
             pass
     df = df.fillna(df.mean())
-    t_mean = float(df_orig.iloc[:, [3]].mean())
-    t_min = float(df_orig.iloc[:, [3]].min())
-    t_max = float(df_orig.iloc[:, [3]].max())
+    #df = df.fillna(method='ffill')
+    #df = df.fillna(method='bfill')
+    t_mean = float(df.values.mean())
+    t_min = float(df.values.min())
+    t_max = float(df.values.max())
     return {"df":df, "mean":t_mean, "min":t_min, "max":t_max}
 
 def load_json_tk():
@@ -64,7 +69,8 @@ def write_json(d):
     
 
 if __name__ == "__main__":
-    d = load_csv_jma()
+    #d = load_csv_jma([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+    d = load_csv_jma([6, 7, 8, 9])
     #d = load_json_tk()
     df = d["df"] 
     t_mean = d["mean"]
@@ -76,16 +82,20 @@ if __name__ == "__main__":
     print("mean:", t_mean, " min:", t_min, " max:", t_max)
     
     # visualize
-    sns.set_context('notebook') # 'paper', 'notebook', 'talk', 'poster'
-    #sns.set(font_scale=1.2)
-    plt.figure(figsize=(20, 16))
+    sns.set_context('poster') # 'paper', 'notebook', 'talk', 'poster'
+    #sns.set(font_scale=3)
+    plt.figure(figsize=(round(df.shape[1]/10)+4, round(df.shape[0]/10)))
+    #plt.figure()
  
     #sns.heatmap(df, cmap="bwr", vmax=t_max, vmin=t_min, center=t_mean, linewidth=0)
     #sns.heatmap(df, cmap="RdBu_r", vmax=t_max, vmin=t_min, center=t_mean, linewidth=0)
     #sns.heatmap(df, cmap="nipy_spectral", vmax=t_max, vmin=t_min, center=t_mean, linewidth=0)
-    ax = sns.heatmap(df, cmap="jet", vmax=t_max, vmin=t_min, center=t_mean, linewidth=0, cbar_kws= {'label': u'(°C)'})
+
+    sns.heatmap(df, cmap="jet", vmax=t_max+2, vmin=t_min, center=t_mean, linewidths=0.003, linecolor="black")
+    #sns.heatmap(df, cmap="jet", linewidths=0, linecolor="black")
+
     #ax.set(xlabel ='x-axis', ylabel='y-axis', xlim=(0,50), ylim=(0,5000))
-    ax.set(xlabel =u'月/日', ylabel=u'年')
+    #ax.set(xlabel =u'月/日', ylabel=u'年')
     #ax.figure.axes[-1].yaxis.label.set_size(50)
 
     #cmap = sns.diverging_palette(250, 10, n=20)
@@ -109,5 +119,7 @@ if __name__ == "__main__":
 
     #plt.setp(sb.get_legend().get_texts(), fontsize='22')
     
-    plt.savefig('img/heatmap.png', bbox_inches='tight')
-    #plt.savefig('img/heatmap.eps', bbox_inches='tight')
+    #plt.savefig('img/heatmap.jpg')
+    plt.savefig('img/heatmap.jpg', bbox_inches='tight')
+    #plt.savefig('img/heatmap.eps')
+    plt.savefig('img/heatmap.eps', bbox_inches='tight')
